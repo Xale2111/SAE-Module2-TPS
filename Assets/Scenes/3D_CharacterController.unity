@@ -1471,8 +1471,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InputMove: {x: 0, y: 0}
-  InputIsRunning: 0
+  IsRunning: 0
   JumpIsPressed: 0
+  InteractPressed: 0
 --- !u!4 &743855572201324660
 Transform:
   m_ObjectHideFlags: 0
@@ -3657,7 +3658,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 5
   runSpeed: 8
-  jumpHeight: 1.2
+  jumpHeight: 0.6
+  fallSpeed: 1.45
   rotationSpeed: 0.1
   groundDetector:
   - {fileID: 6770564781228712809}

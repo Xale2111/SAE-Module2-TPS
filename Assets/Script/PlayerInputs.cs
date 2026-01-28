@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputs : MonoBehaviour
 {
     public Vector2 InputMove;
-    public bool InputIsRunning;
+    public bool IsRunning;
     public bool JumpIsPressed;
     public bool InteractPressed;
     
@@ -14,12 +14,12 @@ public class PlayerInputs : MonoBehaviour
     {
         if (context.started)
         {
-            InputIsRunning = true;
+            IsRunning = true;
         }
 
         if (context.canceled)
         {
-            InputIsRunning = false;
+            IsRunning = false;
         }
     }
 

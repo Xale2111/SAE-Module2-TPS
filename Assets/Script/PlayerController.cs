@@ -10,9 +10,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float walkSpeed = 5f; // [m/s]
     [SerializeField] private float runSpeed = 10f; // [m/s]
     [SerializeField] private float jumpHeight = 1.2f;
+    [SerializeField] private float fallSpeed = 1.7f; 
+    [SerializeField] private float maxVerticalVelocity = 42f; 
     
     [SerializeField][Range(0,1)] private float rotationSpeed = 0.05f;
-    [SerializeField] private GroundDetector[] groundDetector;
+
+    [SerializeField] private float rayCastNormalLength = 0.2f;
+    
+    [SerializeField] private GroundDetector groundDetector;
     
     private PlayerInputs _inputs;
     private CharacterController _characterController;
@@ -21,8 +26,10 @@ public class PlayerController : MonoBehaviour
     private float _verticalVelocity;
 
     private Camera _mainCamera;
-
-    bool isGrounded;
+    
+    bool _landingDone = true;
+    
+    bool _rollingDone = true;
 
     private void Start()
     {
@@ -37,26 +44,48 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         float moveMagnitude = _inputs.InputMove.magnitude;
-        
-        Vector3 horizontalVelocity = _inputs.InputIsRunning ? transform.forward * (moveMagnitude * runSpeed) : transform.forward * (moveMagnitude * walkSpeed);
 
-        foreach (GroundDetector detector in groundDetector)
+        Vector3 horizontalVelocity;
+        
+        if (_landingDone && _rollingDone)
         {
-            isGrounded = false;
-            if (detector.IsGrounded)
+            horizontalVelocity = _inputs.IsRunning ? transform.forward * (moveMagnitude * runSpeed) : transform.forward * (moveMagnitude * walkSpeed); 
+        }
+        else
+        {
+            horizontalVelocity = Vector3.zero;   
+        }
+        
+        if (!_rollingDone)
+        {
+            horizontalVelocity = transform.forward *  walkSpeed/2;
+        }
+
+
+        if (_verticalVelocity < maxVerticalVelocity)
+        {
+            if (_characterController.velocity.y > 0)
             {
-                isGrounded = true;
-                break;
+                _verticalVelocity += Physics.gravity.y * Time.deltaTime;
+            }
+            else
+            {
+                _verticalVelocity += Physics.gravity.y * fallSpeed * Time.deltaTime;
             }
         }
 
-        _verticalVelocity = !isGrounded ? _verticalVelocity + Physics.gravity.y * Time.deltaTime : 0;
+        
 
-
-        if (isGrounded)
+        if (groundDetector.IsGrounded)
         {
+            if (_verticalVelocity < 0.0f)
+            {
+                _verticalVelocity = -2f;
+            }
+            
             if (_inputs.JumpIsPressed)
             {                
+                Debug.Log(_inputs.IsRunning);
                 _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
             }
         }
@@ -70,8 +99,6 @@ public class PlayerController : MonoBehaviour
         
         Quaternion rotation = Quaternion.Euler(0,cameraRotation.eulerAngles.y,0)*inputRotation;
         
-        
-        
         _characterController.Move((horizontalVelocity + new Vector3(0,_verticalVelocity,0))*Time.deltaTime);
 
         if (horizontalVelocity.sqrMagnitude > 0.001f)
@@ -79,7 +106,42 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation,rotation,rotationSpeed);
         }
         
+        
+        
         _animator.SetFloat("AbsVelocity",moveMagnitude);
-        _animator.SetBool("IsRunning",_inputs.InputIsRunning);
+        _animator.SetBool("IsRunning",_inputs.IsRunning);
+        _animator.SetBool("IsFalling", !groundDetector.IsGrounded && _characterController.velocity.y < 0.1f);
     }
+
+    private void OnLandingBegin()
+    {
+        _landingDone = false;
+    }
+
+    private void OnLandingFinish()
+    {
+        _landingDone = true;
+    }
+
+    private void OnRollBegin()
+    {
+        _rollingDone = false;
+    }
+    
+    private void OnRollFinish()
+    {
+        _rollingDone = true;
+    }
+
+    private void SetWasRunning()
+    {
+        _animator.SetBool("WasRunning",_inputs.IsRunning);
+    }
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Debug.DrawRay(transform.position, -Vector3.up * rayCastNormalLength, Color.red);
+    }
+    
 }
