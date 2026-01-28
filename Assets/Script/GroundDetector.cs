@@ -6,7 +6,7 @@ public class GroundDetector : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float coyoteTime = 0.2f;
 
-    public bool IsGrounded = false;
+    public bool IsGrounded = true;
     float coyoteDelay = 0;
     
     private readonly Collider[] _hits = new Collider[1]; 

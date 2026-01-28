@@ -13,9 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fallSpeed = 1.7f; 
     [SerializeField] private float maxVerticalVelocity = 42f; 
     
-    [SerializeField][Range(0,1)] private float rotationSpeed = 0.05f;
-
-    [SerializeField] private float rayCastNormalLength = 0.2f;
+    [SerializeField][Range(0,1)] private float rotationSpeed = 0.05f;    
     
     [SerializeField] private GroundDetector groundDetector;
     
@@ -80,7 +78,7 @@ public class PlayerController : MonoBehaviour
         {
             if (_verticalVelocity < 0.0f)
             {
-                _verticalVelocity = -2f;
+                _verticalVelocity = -5f;
             }
             
             if (_inputs.JumpIsPressed)
@@ -137,11 +135,4 @@ public class PlayerController : MonoBehaviour
     {
         _animator.SetBool("WasRunning",_inputs.IsRunning);
     }
-    
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Debug.DrawRay(transform.position, -Vector3.up * rayCastNormalLength, Color.red);
-    }
-    
 }
