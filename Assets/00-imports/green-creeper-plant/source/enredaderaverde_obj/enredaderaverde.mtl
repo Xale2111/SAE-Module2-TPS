@@ -1,0 +1,45 @@
+
+newmtl Standard575750
+Kd  0.3411765 0.3411765 0.3137255
+Ks  0 0 0
+Ka  0 0 0
+d  1
+Ns  0
+illum 2
+
+
+
+
+newmtl Standard597824
+Kd  0.3490196 0.4705882 0.1411765
+Ks  0 0 0
+Ka  0 0 0
+d  1
+Ns  0
+illum 2
+
+
+
+
+newmtl FlatFFFFFFae041969-74d7-497e-991b-d56f5f23a75f
+Kd  1 1 1
+Ks  0 0 0
+Ka  0 0 0
+d  1
+Ns  0
+illum 0
+map_Kd ae041969-74d7-497e-991b-d56f5f23a75f.png
+
+
+
+
+newmtl Standard7B9C41
+Kd  0.4823529 0.6117647 0.254902
+Ks  0 0 0
+Ka  0 0 0
+d  1
+Ns  0
+illum 2
+
+
+
