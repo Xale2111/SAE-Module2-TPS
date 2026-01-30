@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour
     
     bool _rollingDone = true;
 
+    private bool _canMove = true;
+    
     private void Start()
     {
         _inputs = GetComponent<PlayerInputs>();
@@ -41,75 +43,81 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        float moveMagnitude = _inputs.InputMove.magnitude;
+        if (_canMove)
+        {
 
-        Vector3 horizontalVelocity;
-        
-        if (_landingDone && _rollingDone)
-        {
-            horizontalVelocity = _inputs.IsRunning ? transform.forward * (moveMagnitude * runSpeed) : transform.forward * (moveMagnitude * walkSpeed); 
-        }
-        else
-        {
-            horizontalVelocity = Vector3.zero;   
-        }
-        
-        if (!_rollingDone)
-        {
-            horizontalVelocity = transform.forward *  walkSpeed/2;
-        }
+            float moveMagnitude = _inputs.InputMove.magnitude;
 
+            Vector3 horizontalVelocity;
 
-        if (_verticalVelocity < maxVerticalVelocity)
-        {
-            if (_characterController.velocity.y > 0)
+            if (_landingDone && _rollingDone)
             {
-                _verticalVelocity += Physics.gravity.y * Time.deltaTime;
+                horizontalVelocity = _inputs.IsRunning
+                    ? transform.forward * (moveMagnitude * runSpeed)
+                    : transform.forward * (moveMagnitude * walkSpeed);
             }
             else
             {
-                _verticalVelocity += Physics.gravity.y * fallSpeed * Time.deltaTime;
+                horizontalVelocity = Vector3.zero;
             }
-        }
 
-        
-
-        if (groundDetector.IsGrounded)
-        {
-            if (_verticalVelocity < 0.0f)
+            if (!_rollingDone)
             {
-                _verticalVelocity = -5f;
+                horizontalVelocity = transform.forward * walkSpeed / 2;
             }
-            
-            if (_inputs.JumpIsPressed)
-            {                
-                Debug.Log(_inputs.IsRunning);
-                _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
+
+
+            if (_verticalVelocity < maxVerticalVelocity)
+            {
+                if (_characterController.velocity.y > 0)
+                {
+                    _verticalVelocity += Physics.gravity.y * Time.deltaTime;
+                }
+                else
+                {
+                    _verticalVelocity += Physics.gravity.y * fallSpeed * Time.deltaTime;
+                }
             }
-        }
-        else
-        {
-            _inputs.JumpIsPressed = false;
-        }
 
-        Quaternion inputRotation = Quaternion.LookRotation(new Vector3(_inputs.InputMove.x, 0, _inputs.InputMove.y), Vector3.up);
-        Quaternion cameraRotation = _mainCamera.transform.rotation;
-        
-        Quaternion rotation = Quaternion.Euler(0,cameraRotation.eulerAngles.y,0)*inputRotation;
-        
-        _characterController.Move((horizontalVelocity + new Vector3(0,_verticalVelocity,0))*Time.deltaTime);
+            if (groundDetector.IsGrounded)
+            {
+                if (_verticalVelocity < 0.0f)
+                {
+                    _verticalVelocity = -5f;
+                }
 
-        if (horizontalVelocity.sqrMagnitude > 0.001f)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation,rotation,rotationSpeed);
+                if (_inputs.JumpIsPressed)
+                {
+                    Debug.Log(_inputs.IsRunning);
+                    _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
+                }
+            }
+            else
+            {
+                _inputs.JumpIsPressed = false;
+            }
+
+            Quaternion inputRotation =
+                Quaternion.LookRotation(new Vector3(_inputs.InputMove.x, 0, _inputs.InputMove.y), Vector3.up);
+            Quaternion cameraRotation = _mainCamera.transform.rotation;
+
+            Quaternion rotation = Quaternion.Euler(0, cameraRotation.eulerAngles.y, 0) * inputRotation;
+
+            _characterController.Move((horizontalVelocity + new Vector3(0, _verticalVelocity, 0)) * Time.deltaTime);
+
+            if (horizontalVelocity.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, rotation, rotationSpeed);
+            }
+
+
+
+            _animator.SetFloat("AbsVelocity", moveMagnitude);
+            _animator.SetBool("IsRunning", _inputs.IsRunning);
+            _animator.SetBool("IsFalling", !groundDetector.IsGrounded && _characterController.velocity.y < 0.1f);
         }
-        
-        
-        
-        _animator.SetFloat("AbsVelocity",moveMagnitude);
-        _animator.SetBool("IsRunning",_inputs.IsRunning);
-        _animator.SetBool("IsFalling", !groundDetector.IsGrounded && _characterController.velocity.y < 0.1f);
     }
+        
 
     private void OnLandingBegin()
     {
@@ -134,5 +142,10 @@ public class PlayerController : MonoBehaviour
     private void SetWasRunning()
     {
         _animator.SetBool("WasRunning",_inputs.IsRunning);
+    }
+    
+    public void SetCanMove(bool canMove)
+    {
+        _canMove = canMove;
     }
 }
