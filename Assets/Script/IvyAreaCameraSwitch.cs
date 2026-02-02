@@ -1,3 +1,4 @@
+using System;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,17 +10,27 @@ public class IvyAreaCameraSwitch : MonoBehaviour
     
     [SerializeField] private UnityEvent OnIvyAreaEnter;
     [SerializeField] private UnityEvent OnIvyAreaExit;
-    
+
+    private void Start()
+    {
+        ivyCamera.Priority = 0;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        ivyCamera.Priority = playerCamera.Priority +1;
-        OnIvyAreaEnter.Invoke();
+        if (other.CompareTag("Player"))
+        {
+            ivyCamera.Priority = playerCamera.Priority +1;
+            OnIvyAreaEnter.Invoke();
+        }
     }
     
     private void OnTriggerExit(Collider other)
     {
-        ivyCamera.Priority = 0;
-        OnIvyAreaExit.Invoke();
-        
+        if (other.CompareTag("Player"))
+        {
+            ivyCamera.Priority = 0;
+            OnIvyAreaExit.Invoke();
+        }
     }
 }
