@@ -99,8 +99,7 @@ public class PlayerController : MonoBehaviour
                     }
 
                     if (_inputs.JumpIsPressed)
-                    {
-                        Debug.Log(_inputs.IsRunning);
+                    {                        
                         _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
                     }
                 }
@@ -109,8 +108,7 @@ public class PlayerController : MonoBehaviour
                     _inputs.JumpIsPressed = false;
                 }
 
-                Quaternion inputRotation =
-                    Quaternion.LookRotation(new Vector3(_inputs.InputMove.x, 0, _inputs.InputMove.y), Vector3.up);
+                Quaternion inputRotation = Quaternion.LookRotation(new Vector3(_inputs.InputMove.x, 0, _inputs.InputMove.y), Vector3.up);
                 Quaternion cameraRotation = _mainCamera.transform.rotation;
 
                 Quaternion rotation = Quaternion.Euler(0, cameraRotation.eulerAngles.y, 0) * inputRotation;
@@ -130,12 +128,10 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, _ivyCameraTransform.rotation, .5f);
-                Debug.Log(_inputs.InputMove);
+                transform.rotation = Quaternion.Slerp(transform.rotation, _ivyCameraTransform.rotation, .5f);                
                 if (groundDetector.IsGrounded && _inputs.InputMove.y < 0)
                 {
-                    //Player can back down
-                    Debug.Log("Can back down");
+                    //Player can back down                    
                     _characterController.Move(new Vector3((_inputs.InputMove.x*-1),0,_inputs.InputMove.y*-1) * (Time.deltaTime * walkSpeed));
                 }
                 else
