@@ -9,32 +9,65 @@ public class LeverGame : MonoBehaviour
     [SerializeField] private DoorManager doorManager;
     [SerializeField] CinemachineCamera doorCamera;
     [SerializeField] CinemachineCamera playerCamera;
-
+    
+    [SerializeField] private GameObject[] hiddenPlacedLever;
+    
     [SerializeField] UnityEvent OnDoorOpenBegin;
     [SerializeField] UnityEvent OnDoorOpenFinish;
+    [SerializeField] UnityEvent OnTwoLeverPicked;
 
-    private void OnTriggerStay(Collider other)
+    
+    int pickedUpLever = 0;
+    
+    private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.TryGetComponent(out PlayerController player))
         {
-            Debug.Log("In zone");
-            if (inputs.InteractPressed)
+            if (player.GetLeverPickedUp() >0)
             {
-                Debug.Log("Interact pressed in zone");
+                for (int i = 0; i < player.GetLeverPickedUp(); i++)
+                {
+                    hiddenPlacedLever[pickedUpLever].SetActive(true);
+                    pickedUpLever++;
+                }
+                player.ResetLeverPickedUp();
+            }
+
+            if (pickedUpLever >= hiddenPlacedLever.Length)
+            {
                 OpenDoorBegin();
             }
+            else if (pickedUpLever >= hiddenPlacedLever.Length-1)
+            {
+                OnTwoLeverPicked.Invoke();
+            }
+
+            
         }
     }
 
     private void OpenDoorBegin()
     {
-        doorCamera.Priority = playerCamera.Priority+1;   
         OnDoorOpenBegin.Invoke();        
+        StartCoroutine(SwitchToDoorCamera());
+        
     }
 
     public void OpenDoorFinish()
     {
-        doorCamera.Priority = 0;
         OnDoorOpenFinish.Invoke();
+        StartCoroutine(SwitchToPlayerCamera());
+    }
+    
+    private IEnumerator SwitchToDoorCamera()
+    {
+        yield return new WaitForSeconds(1f);
+        doorCamera.Priority = playerCamera.Priority+1;   
+    }
+    
+    private IEnumerator SwitchToPlayerCamera()
+    {
+        yield return new WaitForSeconds(1f);
+        doorCamera.Priority = 0;
     }
 }

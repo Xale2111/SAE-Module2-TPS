@@ -1,6 +1,7 @@
 using System;
-using UnityEditor.ShaderGraph.Drawing.Inspector.PropertyDrawers;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerInputs))]
@@ -17,6 +18,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField][Range(0,1)] private float rotationSpeed = 0.05f;    
     
     [SerializeField] private GroundDetector groundDetector;
+    
+    [SerializeField] private UnityEvent DestroyArtefactEvent;
     
     private PlayerInputs _inputs;
     private CharacterController _characterController;
@@ -36,6 +39,10 @@ public class PlayerController : MonoBehaviour
     private float _finalRotationSpeed;
 
     private Transform _ivyCameraTransform;
+
+    private Transform _spawnPoint;
+
+    private int _pickedUpLevers = 0;
     
     private void Start()
     {
@@ -46,6 +53,9 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         _finalRotationSpeed = rotationSpeed;
+        _spawnPoint = GameObject.FindGameObjectWithTag("SpawnPoint").transform;
+        
+        transform.position = _spawnPoint.position;
         
         _ivyCameraTransform = GameObject.FindGameObjectWithTag("IvyCamera").transform;
     }
@@ -173,6 +183,9 @@ public class PlayerController : MonoBehaviour
     
     public void SetCanMove(bool canMove)
     {
+        _animator.SetBool("WasRunning", false);
+        _animator.SetFloat("AbsVelocity", 0);
+        Debug.Log("Can move :");
         _canMove = canMove;
     }
 
@@ -191,4 +204,43 @@ public class PlayerController : MonoBehaviour
         _climbing = !_climbing;
         _animator.SetBool("IsClimbing", _climbing);
     }
+    
+    public void AddLeverPickedUp()
+    {
+        _animator.SetTrigger("LeverPickedUp");
+        _pickedUpLevers++;
+        SetCanMove(false);
+    }
+    
+    public int GetLeverPickedUp()
+    {
+        return _pickedUpLevers;
+    }
+    
+    public void ResetLeverPickedUp()
+    {
+        _pickedUpLevers = 0;
+    }
+
+    private void FinishedPickUp()
+    {
+        SetCanMove(true);
+    }
+
+    public void PickUpArtefact()
+    {
+        StartCoroutine(WaitAndFinishPickUp());
+    }
+    
+    private IEnumerator WaitAndFinishPickUp()
+    {
+        yield return new WaitForSeconds(5f);
+        _animator.SetTrigger("PickUpArtefact");
+    }
+
+    private void DestroyArtefact()
+    {
+        DestroyArtefactEvent.Invoke();
+    }
+
 }

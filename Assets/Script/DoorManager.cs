@@ -21,12 +21,18 @@ public class DoorManager : MonoBehaviour
 
     private IEnumerator TimeDoorOpening_CO()
     {
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(1f);
         animator.SetBool("IsOpen", true);
     }
 
     public void EndOpenDoor()
     {
+        StartCoroutine(ReturnToPlayerCamera_CO());
+    }
+    
+    private IEnumerator ReturnToPlayerCamera_CO()
+    {
+        yield return new WaitForSeconds(1f);
         OnFinishDoor.Invoke();
     }
 }
