@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Splines;
 
 public class ManageArtefact : MonoBehaviour
@@ -19,10 +20,13 @@ public class ManageArtefact : MonoBehaviour
     [SerializeField] private GameObject artefact;
     
     bool _inCinematic = false;
+
+    private CinemachineSplineDolly _camDolly;
     
     private void Start()
     {
         canvas.SetActive(false);
+        _camDolly = endCamera.GetComponent<CinemachineSplineDolly>();
     }
 
     private void Update()
@@ -47,6 +51,11 @@ public class ManageArtefact : MonoBehaviour
                 }
             }
         }
+
+        if (_camDolly.CameraPosition >= 1)
+        {   
+            StartCoroutine(GoToCredits_CO());
+        }
     }
 
     private IEnumerator EndCinematic_CO()
@@ -61,7 +70,13 @@ public class ManageArtefact : MonoBehaviour
         cameraSpline.Play();
         endCamera.GetComponent<CinemachineSplineDolly>().AutomaticDolly.Enabled = true;
     }
-    
+
+    private IEnumerator GoToCredits_CO()
+    {
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("Credits");
+    }
+
     public void DestroyArtefact()
     {
         Destroy(artefact);
