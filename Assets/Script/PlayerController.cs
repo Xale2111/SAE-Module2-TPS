@@ -44,6 +44,8 @@ public class PlayerController : MonoBehaviour
 
     private int _pickedUpLevers = 0;
     
+    private FootStepsPlayer _footStepsPlayer;
+    
     private void Start()
     {
         _inputs = GetComponent<PlayerInputs>();
@@ -58,6 +60,8 @@ public class PlayerController : MonoBehaviour
         transform.position = _spawnPoint.position;
         
         _ivyCameraTransform = GameObject.FindGameObjectWithTag("IvyCamera").transform;
+        
+        _footStepsPlayer = GetComponent<FootStepsPlayer>();
     }
 
     private void Update()
@@ -176,6 +180,11 @@ public class PlayerController : MonoBehaviour
         _rollingDone = true;
     }
 
+    private void PlayFootstep()
+    {
+        _footStepsPlayer.PlayFootStep();
+    }
+    
     private void SetWasRunning()
     {
         _animator.SetBool("WasRunning",_inputs.IsRunning);
@@ -242,5 +251,7 @@ public class PlayerController : MonoBehaviour
     {
         DestroyArtefactEvent.Invoke();
     }
+
+    
 
 }

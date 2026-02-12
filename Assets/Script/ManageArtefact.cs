@@ -23,10 +23,13 @@ public class ManageArtefact : MonoBehaviour
 
     private CinemachineSplineDolly _camDolly;
     
+    private AudioSource _audioSource;
+    
     private void Start()
     {
         canvas.SetActive(false);
         _camDolly = endCamera.GetComponent<CinemachineSplineDolly>();
+        _audioSource= GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -61,7 +64,9 @@ public class ManageArtefact : MonoBehaviour
     private IEnumerator EndCinematic_CO()
     {
         UI_Animator.SetTrigger("PickedUpArtefact");
-        yield return new WaitForSeconds(2.2f);
+        yield return new WaitForSeconds(1.2f);
+        GetComponent<AudioSource>().Play();
+        yield return new WaitForSeconds(1f);
         player.transform.position = playerSetupPosition.position;
         player.transform.rotation = playerSetupPosition.rotation;
         endCamera.Priority = 10;
@@ -73,7 +78,7 @@ public class ManageArtefact : MonoBehaviour
 
     private IEnumerator GoToCredits_CO()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(4.2f);
         SceneManager.LoadScene("Credits");
     }
 
